@@ -134,6 +134,9 @@ class _HomeMainState extends State<HomeMain> {
                 child: Image.network(
                   previewUrl ?? "",
                   fit: BoxFit.cover,
+                  errorBuilder: (context, data, trace) {
+                    return Text("Error $data x $trace");
+                  },
                 ),
               ),
             );

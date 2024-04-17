@@ -33,6 +33,9 @@ class FullScreenImageDialog extends StatelessWidget {
             child: Image.network(
               imageUrl,
               fit: BoxFit.cover,
+              errorBuilder: (context, data, trace) {
+                return Text("Error $data x $trace");
+              },
             ),
           ),
         ),
