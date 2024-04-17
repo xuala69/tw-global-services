@@ -12,14 +12,23 @@ class FullScreenImageDialog extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
+        leading: const SizedBox(),
         elevation: 0,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.close),
+          FloatingActionButton(
+            mini: true,
+            backgroundColor: Colors.black38,
             onPressed: () {
               Navigator.pop(context);
             },
+            child: Icon(
+              Icons.close,
+              color: Colors.grey[300],
+            ),
           ),
+          const SizedBox(
+            width: 15,
+          )
         ],
       ),
       extendBodyBehindAppBar: true,
