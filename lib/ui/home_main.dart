@@ -46,6 +46,9 @@ class _HomeMainState extends State<HomeMain> {
       }
     } catch (error) {
       _pagingController.error = error;
+      setState(() {
+        errorMsg = "Error fetching data from API. Please try again later catch";
+      });
     }
   }
 
