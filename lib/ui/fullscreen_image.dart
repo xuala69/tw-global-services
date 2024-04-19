@@ -18,6 +18,9 @@ class FullScreenImageDialog extends StatelessWidget {
         actions: [
           FloatingActionButton(
             mini: true,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(45),
+            ),
             backgroundColor: Colors.black38,
             onPressed: () {
               Navigator.pop(context);
