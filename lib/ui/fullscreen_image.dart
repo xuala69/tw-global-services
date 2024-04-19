@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class FullScreenImageDialog extends StatelessWidget {
@@ -44,6 +45,12 @@ class FullScreenImageDialog extends StatelessWidget {
               fit: BoxFit.cover,
               errorBuilder: (context, data, trace) {
                 return Text("Error $data x $trace");
+              },
+              loadingBuilder: (context, child, progress) {
+                if (progress == null) return child;
+                return const Center(
+                  child: CupertinoActivityIndicator(),
+                );
               },
             ),
           ),
