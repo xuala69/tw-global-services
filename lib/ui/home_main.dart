@@ -7,6 +7,7 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:tw_global_services/controllers/image_controller.dart';
 import 'package:tw_global_services/models/pixa_model.dart';
 import 'package:tw_global_services/ui/fullscreen_image.dart';
+import 'package:tw_global_services/utils/search_delegate.dart';
 
 class HomeMain extends StatefulWidget {
   const HomeMain({super.key});
@@ -19,11 +20,25 @@ class _HomeMainState extends State<HomeMain> {
   final _pagingController = PagingController<int, PixaModel>(firstPageKey: 1);
 
   final _ctrl = Get.put(ImageController());
+
+  final controller = TextEditingController();
   String? errorMsg;
   final int _pageSize = 200;
 
+  final RxString _searchText = "".obs;
+
   @override
   void initState() {
+    debounce(
+      _searchText,
+      (text) {
+        log("Debounced function");
+
+        _pagingController.refresh();
+        log("Refresh called ");
+      },
+      time: const Duration(milliseconds: 500),
+    );
     // add listener to request more data when needed
     _pagingController.addPageRequestListener((page) {
       //fetch data initially once
@@ -35,7 +50,11 @@ class _HomeMainState extends State<HomeMain> {
   Future<void> _fetchPage(int pageKey) async {
     try {
       //get images from api
-      final newItems = await _ctrl.getImages(pageKey, perPage: _pageSize);
+      final newItems = await _ctrl.getImages(
+        pageKey,
+        perPage: _pageSize,
+        search: _searchText.value,
+      );
       // if items are null, show error message
       if (newItems == null) {
         setState(() {
@@ -50,16 +69,6 @@ class _HomeMainState extends State<HomeMain> {
       } else {
         _pagingController.appendPage(newItems, pageKey + 1);
       }
-      // if (isLastPage) {
-      //   log("is Last page:TRUE");
-      //   // add items as last page
-      //   _pagingController.appendLastPage(newItems);
-      // } else {
-      //   // add items to the list and pass next page key to controller to know that more items are available
-      //   final nextPageKey = pageKey + newItems.length;
-      //   log("is Last page:FALSE, NEXTPAGE: $nextPageKey");
-      //   _pagingController.appendPage(newItems, nextPageKey);
-      // }
     } catch (error) {
       // error occurs and shown to UI
       _pagingController.error = error;
@@ -72,6 +81,36 @@ class _HomeMainState extends State<HomeMain> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        title: TextField(
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+          ),
+          controller: controller,
+          decoration: InputDecoration(
+            hintText: 'Search...',
+            hintStyle: const TextStyle(
+              color: Colors.white54,
+              fontSize: 16,
+            ),
+            border: InputBorder.none,
+            suffixIcon: IconButton(
+              icon: const Icon(Icons.clear),
+              onPressed: () {
+                _searchText.value = "";
+                controller.clear();
+              },
+            ),
+          ),
+          onChanged: (value) {
+            _searchText.value = value;
+          },
+        ),
+      ),
       body: PagedGridView<int, PixaModel>(
         physics: const BouncingScrollPhysics(),
         pagingController: _pagingController,
@@ -179,15 +218,6 @@ class _HomeMainState extends State<HomeMain> {
                     ],
                   ),
                 ),
-                // child: Image.network(
-                //   // displays preview image, if null, display default image
-                //   previewUrl ??
-                //       "https://cdn.pixabay.com/photo/2024/04/17/08/45/ai-generated-8701693_150.jpg",
-                //   fit: BoxFit.cover,
-                //   errorBuilder: (context, data, trace) {
-                //     return Text("Error $data x $trace");
-                //   },
-                // ),
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: const BorderRadius.all(
@@ -215,5 +245,81 @@ class _HomeMainState extends State<HomeMain> {
     // dispose controller when no longer needed
     _pagingController.dispose();
     super.dispose();
+  }
+}
+
+class _CustomSearchDelegate extends StatefulWidget {
+  final TextEditingController searchController;
+  final List<String> searchResults;
+  final Function(String) onItemTapped;
+
+  const _CustomSearchDelegate({
+    required this.searchController,
+    required this.searchResults,
+    required this.onItemTapped,
+  });
+
+  @override
+  __CustomSearchDelegateState createState() => __CustomSearchDelegateState();
+}
+
+class __CustomSearchDelegateState extends State<_CustomSearchDelegate> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+        elevation: 0,
+        title: TextField(
+          controller: widget.searchController,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+          ),
+          decoration: const InputDecoration(
+            hintText: 'Search...',
+            hintStyle: TextStyle(
+              color: Colors.white54,
+              fontSize: 16,
+            ),
+            border: InputBorder.none,
+          ),
+          onChanged: (value) {
+            setState(() {});
+          },
+        ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.clear),
+            onPressed: () {
+              widget.searchController.clear();
+              setState(() {});
+            },
+          ),
+        ],
+      ),
+      body: ListView.builder(
+        itemCount: widget.searchResults
+            .where((item) => item
+                .toLowerCase()
+                .contains(widget.searchController.text.toLowerCase()))
+            .length,
+        itemBuilder: (context, index) {
+          final filteredItem = widget.searchResults
+              .where((item) => item
+                  .toLowerCase()
+                  .contains(widget.searchController.text.toLowerCase()))
+              .toList()[index];
+          return ListTile(
+            title: Text(filteredItem),
+            onTap: () {
+              widget.onItemTapped(filteredItem);
+              Navigator.of(context).pop();
+            },
+          );
+        },
+      ),
+    );
   }
 }

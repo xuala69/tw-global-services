@@ -8,11 +8,12 @@ class ImageController extends GetxController {
   static ImageController get to => Get.find();
   final dio = Dio();
 
-  Future<List<PixaModel>?> getImages(int pageNo, {required int perPage}) async {
+  Future<List<PixaModel>?> getImages(int pageNo,
+      {required int perPage, required String search}) async {
     try {
-      log("PAGE NO:$pageNo");
+      log("PAGE NO:$pageNo Q:$search");
       final resp = await dio.get(
-        "${Strings.apiUrl}?key=${Strings.apiToken}&page=$pageNo&per_page=$perPage",
+        "${Strings.apiUrl}?key=${Strings.apiToken}&page=$pageNo&per_page=$perPage&q=$search",
         queryParameters: {
           "Access-Control-Allow-Origin": "*",
           'Content-Type': 'application/json',
