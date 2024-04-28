@@ -63,15 +63,15 @@ class _HomeMainState extends State<HomeMain> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
       body: PagedGridView<int, PixaModel>(
         pagingController: _pagingController,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           // determine width and set cross axis item count accordingly
-          crossAxisCount: MediaQuery.of(context).size.width ~/ 150,
+          crossAxisCount: MediaQuery.of(context).size.width ~/ 250,
           crossAxisSpacing: 4,
           mainAxisSpacing: 4,
         ),
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
         builderDelegate: PagedChildBuilderDelegate<PixaModel>(
           itemBuilder: (context, item, index) {
             //current index item
@@ -112,8 +112,13 @@ class _HomeMainState extends State<HomeMain> {
               },
               child: GridTile(
                 footer: Container(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
                   decoration: const BoxDecoration(
-                    color: Colors.black54,
+                    color: Colors.black38,
+                    borderRadius: BorderRadius.only(
+                      bottomLeft: Radius.circular(4),
+                      bottomRight: Radius.circular(4),
+                    ),
                   ),
                   child: Row(
                     children: [
@@ -125,16 +130,16 @@ class _HomeMainState extends State<HomeMain> {
                               likes.toString(),
                               style: GoogleFonts.roboto(
                                 color: Colors.grey[200],
-                                fontSize: 15,
+                                fontSize: 17,
                               ),
                             ),
                             const SizedBox(
-                              width: 5,
+                              width: 8,
                             ),
                             Icon(
                               Icons.thumb_up_alt_outlined,
                               color: Colors.grey[200],
-                              size: 15,
+                              size: 17,
                             ),
                           ],
                         ),
@@ -147,16 +152,16 @@ class _HomeMainState extends State<HomeMain> {
                               views.toString(),
                               style: GoogleFonts.roboto(
                                 color: Colors.grey[200],
-                                fontSize: 15,
+                                fontSize: 17,
                               ),
                             ),
                             const SizedBox(
-                              width: 5,
+                              width: 8,
                             ),
                             Icon(
                               Icons.remove_red_eye_outlined,
                               color: Colors.grey[200],
-                              size: 15,
+                              size: 17,
                             ),
                           ],
                         ),
@@ -164,14 +169,28 @@ class _HomeMainState extends State<HomeMain> {
                     ],
                   ),
                 ),
-                child: Image.network(
-                  // displays preview image, if null, display default image
-                  previewUrl ??
-                      "https://cdn.pixabay.com/photo/2024/04/17/08/45/ai-generated-8701693_150.jpg",
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, data, trace) {
-                    return Text("Error $data x $trace");
-                  },
+                // child: Image.network(
+                //   // displays preview image, if null, display default image
+                //   previewUrl ??
+                //       "https://cdn.pixabay.com/photo/2024/04/17/08/45/ai-generated-8701693_150.jpg",
+                //   fit: BoxFit.cover,
+                //   errorBuilder: (context, data, trace) {
+                //     return Text("Error $data x $trace");
+                //   },
+                // ),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(
+                      Radius.circular(4),
+                    ),
+                    image: DecorationImage(
+                      image: NetworkImage(
+                        previewUrl ??
+                            "https://cdn.pixabay.com/photo/2024/04/17/08/45/ai-generated-8701693_150.jpg",
+                      ),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
               ),
             );
