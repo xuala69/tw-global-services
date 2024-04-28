@@ -8,10 +8,11 @@ class ImageController extends GetxController {
   static ImageController get to => Get.find();
   final dio = Dio();
 
-  Future<List<PixaModel>?> getImages(int pageNo) async {
+  Future<List<PixaModel>?> getImages(int pageNo, {required int perPage}) async {
     try {
+      log("PAGE NO:$pageNo");
       final resp = await dio.get(
-        "${Strings.apiUrl}?key=${Strings.apiToken}",
+        "${Strings.apiUrl}?key=${Strings.apiToken}&page=$pageNo&per_page=$perPage",
         queryParameters: {
           "Access-Control-Allow-Origin": "*",
           'Content-Type': 'application/json',
@@ -29,9 +30,17 @@ class ImageController extends GetxController {
         return hits;
       } else {
         log("Error responded from server: ${resp.data}");
-        return null;
+        return [];
       }
     } catch (e) {
+      if (e is DioException) {
+        final msg = e.response?.data;
+        if (msg is String && msg.contains("out of valid range.")) {
+          log("out of range");
+          return [];
+        }
+        return null;
+      }
       log("Error getting Images: $e");
       return null;
     }

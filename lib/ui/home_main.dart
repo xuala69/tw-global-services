@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,7 +20,7 @@ class _HomeMainState extends State<HomeMain> {
 
   final _ctrl = Get.put(ImageController());
   String? errorMsg;
-  final int _pageSize = 20;
+  final int _pageSize = 200;
 
   @override
   void initState() {
@@ -33,7 +35,7 @@ class _HomeMainState extends State<HomeMain> {
   Future<void> _fetchPage(int pageKey) async {
     try {
       //get images from api
-      final newItems = await _ctrl.getImages(pageKey);
+      final newItems = await _ctrl.getImages(pageKey, perPage: _pageSize);
       // if items are null, show error message
       if (newItems == null) {
         setState(() {
@@ -44,13 +46,20 @@ class _HomeMainState extends State<HomeMain> {
       //compare returned data length with page size to determine if last page is reached
       final isLastPage = newItems.length < _pageSize;
       if (isLastPage) {
-        // add items as last page
         _pagingController.appendLastPage(newItems);
       } else {
-        // add items to the list and pass next page key to controller to know that more items are available
-        final nextPageKey = pageKey + newItems.length;
-        _pagingController.appendPage(newItems, nextPageKey);
+        _pagingController.appendPage(newItems, pageKey + 1);
       }
+      // if (isLastPage) {
+      //   log("is Last page:TRUE");
+      //   // add items as last page
+      //   _pagingController.appendLastPage(newItems);
+      // } else {
+      //   // add items to the list and pass next page key to controller to know that more items are available
+      //   final nextPageKey = pageKey + newItems.length;
+      //   log("is Last page:FALSE, NEXTPAGE: $nextPageKey");
+      //   _pagingController.appendPage(newItems, nextPageKey);
+      // }
     } catch (error) {
       // error occurs and shown to UI
       _pagingController.error = error;
@@ -64,6 +73,7 @@ class _HomeMainState extends State<HomeMain> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: PagedGridView<int, PixaModel>(
+        physics: const BouncingScrollPhysics(),
         pagingController: _pagingController,
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           // determine width and set cross axis item count accordingly

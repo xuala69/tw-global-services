@@ -1,5 +1,5 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:photo_view/photo_view.dart';
 
 class FullScreenImageDialog extends StatelessWidget {
   final String imageUrl;
@@ -36,27 +36,9 @@ class FullScreenImageDialog extends StatelessWidget {
         ],
       ),
       extendBodyBehindAppBar: true,
-      body: Transform.scale(
-        scale: 1.5,
-        child: Center(
-          child: GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Image.network(
-              imageUrl,
-              fit: BoxFit.cover,
-              errorBuilder: (context, data, trace) {
-                return Text("Error $data x $trace");
-              },
-              loadingBuilder: (context, child, progress) {
-                if (progress == null) return child;
-                return const Center(
-                  child: CupertinoActivityIndicator(),
-                );
-              },
-            ),
-          ),
+      body: PhotoView(
+        imageProvider: NetworkImage(
+          imageUrl,
         ),
       ),
     );
