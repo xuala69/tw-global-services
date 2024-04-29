@@ -7,7 +7,6 @@ import 'package:infinite_scroll_pagination/infinite_scroll_pagination.dart';
 import 'package:tw_global_services/controllers/image_controller.dart';
 import 'package:tw_global_services/models/pixa_model.dart';
 import 'package:tw_global_services/ui/fullscreen_image.dart';
-import 'package:tw_global_services/utils/search_delegate.dart';
 
 class HomeMain extends StatefulWidget {
   const HomeMain({super.key});
